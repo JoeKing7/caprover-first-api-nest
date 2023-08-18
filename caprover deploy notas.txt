@@ -1,3 +1,4 @@
+archivo captain-definition: 
 {
     "schemaVersion": 2,
     "dockerfileLines": [
@@ -8,4 +9,12 @@
       "RUN npm install && npm cache clean --force",
       "CMD [ \"npm\", \"run\", \"start:dev\" ]"
     ]
-  }
+}
+
+  ----------
+
+  crear el tar con los archivos: 
+  tar -cvf ./deploy.tar --exclude='*.map' ./captain-definition ./package.json ./tsconfig.json ./src/*
+
+  hacer el deploy:
+  caprover deploy -t ./deploy.tar
