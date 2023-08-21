@@ -6,7 +6,7 @@ import path from 'path';
 export class AppService {
   getHello(): string {
     
-    const fileData = readFileSync(`${process.cwd()}/src/files/test.txt`);
-    return `Hello NEST World! . Test for caprover --- ${fileData}`;
+    const fileData = readFileSync(`${__dirname}/files/test.txt`);
+    return `Hello NEST World! . Test for caprover. File content: --- ${fileData} ---`;
   }
 }

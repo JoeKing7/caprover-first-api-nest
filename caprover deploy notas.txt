@@ -1,4 +1,6 @@
-archivo captain-definition: 
+archivo captain-definition:  
+
+##### opción 1 
 {
     "schemaVersion": 2,
     "dockerfileLines": [
@@ -6,15 +8,25 @@ archivo captain-definition:
       "RUN mkdir -p /usr/src/app",
       "WORKDIR /usr/src/app",
       "COPY ./ /usr/src/app",
+      "CMD [ \"npm\", \"i\", \"-g\", \"@nestjs/cli\" ]",   ---- primera vez hay que instalar el nest
       "RUN npm install && npm cache clean --force",
-      "CMD [ \"npm\", \"run\", \"start:dev\" ]"
+      "CMD [ \"npm\", \"run\", \"build\" ]",   ---- para generar la carpeta dist
+      "CMD [ \"npm\", \"run\", \"start:prod\" ]" ---- correr en prod
     ]
 }
 
+##### Opción 2 - <<< USADA >>>
+  {
+    "schemaVersion": 2,
+    "dockerfilePath": "./Dockerfile"
+  }
   ----------
 
   crear el tar con los archivos: 
-  tar -cvf ./deploy.tar --exclude='*.map' ./captain-definition ./package.json ./tsconfig.json ./src/*
-
+  tar -cvf ./deploy.tar --exclude='*.map' ./captain-definition ./package.json ./tsconfig.json ./tsconfig.build.json ./nest-cli.json ./Dockerfile ./src/*
+  
   hacer el deploy:
   caprover deploy -t ./deploy.tar
+
+  **************************************************
+  Para incluir archivos diferentes a ts o js en la carpeta de dist , fijar se en el archivo nest-cli

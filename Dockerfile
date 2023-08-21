@@ -1,10 +1,43 @@
-FROM node:16.20.1
-RUN mkdir -p /usr/src/app
+# Install dependencies only when needed
+FROM node:16.20.1-alpine3.18 AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json ./
+COPY nest-cli.json ./
+RUN npm install --frozen-lockfile
+
+# Build the app with cache dependencies
+FROM node:16.20.1 AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+
+# Production image, copy all the files and run next
+FROM node:16.20.1 AS runner
+
+# Set working directory
 WORKDIR /usr/src/app
-COPY ./package.json /usr/src/app/
-RUN npm install && npm cache clean --force
-COPY ./ /usr/src/app
-ENV NODE_ENV production
-ENV PORT 4000
-EXPOSE 4000
-CMD [ "npm", "start:prod" ]"
+
+COPY package.json ./
+
+RUN npm install --prod
+
+COPY --from=builder /app/dist ./dist
+
+# # Copiar el directorio y su contenido
+# RUN mkdir -p ./pokedex
+
+# COPY --from=builder ./app/dist/ ./app
+# COPY ./.env ./app/.env
+
+# # Dar permiso para ejecutar la applicación
+# RUN adduser --disabled-password pokeuser
+# RUN chown -R pokeuser:pokeuser ./pokedex
+# USER pokeuser
+
+# EXPOSE 3000
+
+CMD [ "node","dist/src/main" ]
